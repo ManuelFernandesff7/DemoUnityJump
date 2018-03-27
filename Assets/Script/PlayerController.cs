@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayerController : MonoBehaviour {
-
+	public GameObject game;
+	public GameObject enemyGenerator;
 	// Use this for initialization
 	private Animator animator;
 	void Start () {
@@ -13,8 +14,8 @@ public class PlayerController : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-
-		if (Input.GetKeyDown ("up") || Input.GetMouseButtonDown (0)) {
+		bool gamePlaying = game.GetComponent<GameController> ().gameState == GameController.GameState.Playing;
+		if (gamePlaying && (Input.GetKeyDown ("up") || Input.GetMouseButtonDown (0))) {
 			UpdateState ("PlayerJump");
 		}
 		
@@ -24,5 +25,14 @@ public class PlayerController : MonoBehaviour {
 			animator.Play (state);
 		}
 	
+	}
+
+	void OnTriggerEnter2D( Collider2D other){
+		if (other.gameObject.tag == "Enemy") {
+			UpdateState("PlayerDead");
+		}
+		game.GetComponent<GameController>().gameState = GameController.GameState.Ended;
+		enemyGenerator.SendMessage ("CancelGenerator",true);
+
 	}
 }
